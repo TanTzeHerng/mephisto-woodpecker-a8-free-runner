@@ -235,5 +235,10 @@
   "270": {
     "status": "failed",
     "finished_at": "2026-10-30T21:13:03.697296+00:00"
+  },
+  "1030": {
+    "status": "technical",
+    "finished_at": "2026-10-30T21:13:06.448246+00:00",
+    "reason": "ValueError:requires_special_rights_history"
   }
 }
