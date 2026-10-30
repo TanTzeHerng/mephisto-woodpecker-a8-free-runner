@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "generated_utc": "2026-10-30T21:13:06.448721+00:00",
+  "generated_utc": "2026-10-30T21:13:08.038794+00:00",
   "feed_relay_connected": true,
   "source_machine": "GitHub Actions Linux (not PC)",
   "last_result_utc": "2026-10-30T21:13:06.448246+00:00",
@@ -46,16 +46,16 @@
     "pending": 879,
     "solved_rate": 74.35
   },
-  "active_search_processes": 0,
+  "active_search_processes": 1,
   "worker": {
     "active": true,
-    "current_puzzle": null
+    "current_puzzle": 171
   },
   "batches": [
     {
       "name": "GitHub-hosted Mephisto A8",
       "running": true,
-      "active_searches": 0
+      "active_searches": 1
     }
   ],
   "contains_solutions": false,
