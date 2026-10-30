@@ -1,0 +1,31 @@
+name: Original-ROM Mephisto A8 Woodpecker (free hosted Linux)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: mephisto-woodpecker-a8-public-relay
+  cancel-in-progress: false
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Restore protected original ROM and emulator core, compile Linux runner
+        env:
+          ROM_SOURCE_B64: ${{ secrets.ROM_SOURCE_B64 }}
+          CORE_H_B64: ${{ secrets.CORE_H_B64 }}
+        run: |
+          test -n "$ROM_SOURCE_B64" && test -n "$CORE_H_B64"
+          printf '%s' "$ROM_SOURCE_B64" | base64 --decode > original_rom.inc
+          printf '%s' "$CORE_H_B64" | base64 --decode > mephisto_core.h
+          python -m pip install python-chess
+          g++ -std=c++17 -O3 -o rom_console rom_console.cpp
+      - name: Run the authentic A8 firmware to natural completion and publish spoiler-free results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -u worker.py

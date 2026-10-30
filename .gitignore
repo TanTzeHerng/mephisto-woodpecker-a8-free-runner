@@ -1,0 +1,5 @@
+original_rom.inc
+mephisto_core.h
+rom_console
+__pycache__/
+*.pyc
