@@ -1,5 +1,6 @@
 import datetime as dt, io, json, os, pathlib, re, subprocess, sys, time, urllib.request
 import chess, chess.pgn
+import threading
 ROOT=pathlib.Path(__file__).resolve().parent
 EXE=ROOT/'rom_console'; FILE=ROOT/'status.json'; RESULTS=ROOT/'results.json'
 IDS=['4xLfA0En','KicQp8vU','fIfq3LZR','z5vB3TII','k6kRDIK1','L1eiMWmn','PpL7KEKy','y5VebmDO','RJQS7j5G','KPtKmETT','Cy4v4dlS','HjGgG3Dn','lBdYC3vM','ZcyZ5DVD','44kFiZlc','fxpx4587','LAt4RZVy','KU6tPNfj','MC5fBpLs','InyVvVo7','Pap9LVsX','zTCW809p','Tow5byBK']
@@ -56,7 +57,7 @@ def positions():
    n=int(m.group(1))
    if not (151<=n<=222 or 251<=n<=984 or 1011<=n<=1128):continue
    try:
-    b=chess.Board(g.headers['FEN']);move=next(g.mainline_moves())
+    b=chess.Board(g.headers['FEN']);move=next(iter(g.mainline_moves()))
     if move not in b.legal_moves:continue
     out[n]=(b,move)
    except (KeyError,ValueError,StopIteration):pass
@@ -122,11 +123,21 @@ def main():
  for n in queue:
   board,solution=data[n]
   print('SEARCH_START',n,now(),flush=True)
-  status(rows,active=n)
+  push(rows,active=n)
+  heartbeat_stop=threading.Event()
+  def heartbeat():
+   while not heartbeat_stop.wait(90):
+    try:push(rows,active=n)
+    except Exception as e:print('HEARTBEAT_ERROR',type(e).__name__,flush=True)
+  heartbeat_thread=threading.Thread(target=heartbeat,daemon=True)
+  heartbeat_thread.start()
   try:
    status_name='solved' if attempt(board,solution) else 'failed';reason=None
   except Exception as e:
    status_name='technical';reason=type(e).__name__+':'+str(e)[:100]
+  finally:
+   heartbeat_stop.set()
+   heartbeat_thread.join(timeout=10)
   rows[str(n)]={'status':status_name,'finished_at':now()}
   if reason:rows[str(n)]['reason']=reason
   RESULTS.write_text(json.dumps(rows,indent=2),encoding='utf8')
