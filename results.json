@@ -240,5 +240,9 @@
     "status": "technical",
     "finished_at": "2026-10-30T21:13:06.448246+00:00",
     "reason": "ValueError:requires_special_rights_history"
+  },
+  "171": {
+    "status": "solved",
+    "finished_at": "2026-10-30T21:16:14.865514+00:00"
   }
 }
