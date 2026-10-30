@@ -1,4 +1,4 @@
-import datetime as dt, io, json, os, pathlib, re, subprocess, sys, time, urllib.request
+import datetime as dt, io, json, os, pathlib, re, subprocess, sys, time, urllib.request, urllib.error
 import chess, chess.pgn
 import threading
 ROOT=pathlib.Path(__file__).resolve().parent
@@ -41,27 +41,42 @@ def push(rows,active=None,running=True):
  if p.returncode:print('CHECKPOINT_PUSH_ERROR',p.stderr[-250:],flush=True)
 def positions():
  out={}
- for part,id in enumerate(IDS,1):
-  try:
-   req=urllib.request.Request('https://lichess.org/api/study/'+id+'.pgn',headers={'User-Agent':'Woodpecker-Mephisto-A8/1.0'})
-   with urllib.request.urlopen(req,timeout=35) as response:s=response.read().decode('utf-8-sig')
-  except Exception as e:
-   print('STUDY_ERROR',part,str(e)[:100],flush=True);continue
-  buffer=io.StringIO(s)
-  while True:
-   try:g=chess.pgn.read_game(buffer)
-   except Exception as e:print('PARSE_ERROR',part,type(e).__name__,flush=True);break
-   if g is None:break
-   m=re.search(r'(?:Puzzle\s*no\.?|Exercise)\s*(\d+)',g.headers.get('ChapterName',''),re.I)
-   if not m:continue
-   n=int(m.group(1))
-   if not (151<=n<=222 or 251<=n<=984 or 1011<=n<=1128):continue
+ for part,study in enumerate(IDS,1):
+  data=None
+  for attempt_no in range(4):
    try:
-    b=chess.Board(g.headers['FEN']);move=next(iter(g.mainline_moves()))
-    if move not in b.legal_moves:continue
-    out[n]=(b,move)
-   except (KeyError,ValueError,StopIteration):pass
-  print('STUDY_LOADED',part,len(out),flush=True)
+    req=urllib.request.Request('https://lichess.org/api/study/'+study+'.pgn',
+     headers={'User-Agent':'Woodpecker-Mephisto-A8-Research/1.0','Accept':'application/x-chess-pgn'})
+    with urllib.request.urlopen(req,timeout=60) as response:
+     data=response.read().decode('utf-8-sig')
+    break
+   except urllib.error.HTTPError as exc:
+    print('STUDY_HTTP',part,exc.code,'attempt',attempt_no+1,flush=True)
+    if exc.code!=429:break
+    time.sleep(60*(attempt_no+1))
+   except Exception as exc:
+    print('STUDY_DOWNLOAD_ERROR',part,type(exc).__name__,flush=True)
+    time.sleep(15)
+  if data:
+   stream=io.StringIO(data)
+   while True:
+    try:game=chess.pgn.read_game(stream)
+    except Exception as exc:print('STUDY_PARSE_ERROR',part,type(exc).__name__,flush=True);break
+    if game is None:break
+    m=re.search(r'(?:Puzzle\s*no\.?|Exercise)\s*(\d+)',game.headers.get('ChapterName',''),re.I)
+    if not m:continue
+    n=int(m.group(1))
+    if not (151<=n<=222 or 251<=n<=984 or 1011<=n<=1128):continue
+    try:
+     board=chess.Board(game.headers['FEN'])
+     expected=next(iter(game.mainline_moves()))
+     if expected in board.legal_moves:out[n]=(board,expected)
+    except (KeyError,ValueError,StopIteration):pass
+  print('STUDY_LOADED',part,'TOTAL',len(out),flush=True)
+  if part%3==0:
+   try:push(read_rows(),running=True)
+   except Exception as exc:print('DATA_FETCH_HEARTBEAT_ERROR',type(exc).__name__,flush=True)
+  time.sleep(12)
  return out
 def predecessor(b):
  if b.turn:return b.copy(stack=False),None

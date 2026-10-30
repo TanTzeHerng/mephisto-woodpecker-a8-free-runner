@@ -24,7 +24,7 @@ jobs:
           printf '%s' "$CORE_H_B64" | base64 --decode > mephisto_core.h
           python -m pip install python-chess
           g++ -std=c++17 -O3 -o rom_console rom_console.cpp
-      - name: Run the authentic A8 firmware to natural completion and publish spoiler-free results
+      - name: Natural A8 search, throttled Lichess study retrieval, spoiler-free checkpoints
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

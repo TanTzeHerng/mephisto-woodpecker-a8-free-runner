@@ -3,3 +3,6 @@ mephisto_core.h
 rom_console
 __pycache__/
 *.pyc
+private_study_cache/
+*_secret.b64
+*_dataset.txt
