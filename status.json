@@ -1,9 +1,9 @@
 {
   "schema": 2,
-  "generated_utc": "2026-10-30T19:39:52.256968+00:00",
+  "generated_utc": "2026-10-30T19:40:01.749391+00:00",
   "feed_relay_connected": true,
   "source_machine": "GitHub Actions Linux (not PC)",
-  "last_result_utc": "2026-10-30T19:36:47.537880+00:00",
+  "last_result_utc": "2026-10-30T19:40:01.748990+00:00",
   "chapters": {
     "Easy": {
       "solved": 115,
@@ -16,14 +16,14 @@
       "solved_rate": 86.47
     },
     "Intermediate": {
-      "solved": 24,
+      "solved": 25,
       "failed": 15,
       "technical": 0,
       "total": 762,
-      "graded": 39,
-      "observed": 39,
-      "pending": 723,
-      "solved_rate": 61.54
+      "graded": 40,
+      "observed": 40,
+      "pending": 722,
+      "solved_rate": 62.5
     },
     "Advanced": {
       "solved": 18,
@@ -37,25 +37,25 @@
     }
   },
   "totals": {
-    "solved": 157,
+    "solved": 158,
     "failed": 48,
     "technical": 18,
     "total": 1128,
-    "graded": 205,
-    "observed": 223,
-    "pending": 905,
-    "solved_rate": 76.59
+    "graded": 206,
+    "observed": 224,
+    "pending": 904,
+    "solved_rate": 76.7
   },
-  "active_search_processes": 1,
+  "active_search_processes": 0,
   "worker": {
     "active": true,
-    "current_puzzle": 262
+    "current_puzzle": null
   },
   "batches": [
     {
       "name": "GitHub-hosted Mephisto A8",
       "running": true,
-      "active_searches": 1
+      "active_searches": 0
     }
   ],
   "contains_solutions": false,
